@@ -469,6 +469,674 @@
         .pin-dots.shake {
             animation: shake 0.4s ease;
         }
+
+        /* ── 테마 드롭다운 ── */
+        .theme-dropdown {
+            position: relative;
+            margin-left: auto;
+        }
+
+        .theme-btn {
+            background: #1e2535;
+            border: 1px solid #3a4560;
+            border-radius: 6px;
+            color: #8b9dc0;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            transition: all 0.18s;
+        }
+
+        .theme-btn:hover {
+            background: #252a38;
+            color: var(--text-main);
+        }
+
+        .theme-btn .chev {
+            font-size: 0.65rem;
+            transition: transform 0.2s;
+        }
+
+        .theme-dropdown.open .chev {
+            transform: rotate(180deg);
+        }
+
+        .theme-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            background: #1e2535;
+            border: 1px solid #3a4560;
+            border-radius: 8px;
+            overflow: hidden;
+            min-width: 130px;
+            z-index: 9000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-dropdown.open .theme-menu {
+            display: block;
+        }
+
+        .theme-item {
+            padding: 9px 16px;
+            font-size: 0.82rem;
+            color: #8b9dc0;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .theme-item:hover {
+            background: #252a38;
+            color: #d0d4e0;
+        }
+
+        .theme-item.active {
+            background: #2b6cb0;
+            color: #fff;
+        }
+
+        /* ── 라이트 모드 ── */
+        body.light {
+            --bg-main: #f0f2f8;
+            --bg-header: #ffffff;
+            --bg-cell: #ffffff;
+            --bg-cell-weekend: #fdf4fd;
+            --bg-cell-today: #eef2ff;
+            --border: #dce3f0;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --text-day-sun: #e53e3e;
+            --text-day-sat: #3182ce;
+            --row1-on: #e53e3e;
+            --row1-on-text: #fff;
+            --row1-off: #fee2e2;
+            --row1-off-text: #b91c1c;
+            --row2-on: #2b6cb0;
+            --row2-on-text: #fff;
+            --row2-off: #dbeafe;
+            --row2-off-text: #1d4ed8;
+            --row3-on: #276749;
+            --row3-on-text: #fff;
+            --row3-off: #dcfce7;
+            --row3-off-text: #166534;
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        body.light #cal-title {
+            color: #1e293b;
+        }
+
+        body.light #cal-title .nepe-count {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+            color: #4338ca;
+        }
+
+        body.light #cal-title .nepe-count .count-num {
+            color: #3730a3;
+        }
+
+        body.light #cal-title .nepe-count.goal-done {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        body.light .nav-btn {
+            border-color: #dce3f0;
+            color: #718096;
+        }
+
+        body.light .nav-btn:hover {
+            background: #f1f5f9;
+            color: #2d3748;
+            border-color: #b0bcd8;
+        }
+
+        body.light .lock-btn {
+            border-color: #dce3f0;
+            opacity: 0.6;
+        }
+
+        body.light .lock-btn:hover {
+            background: #faf5ff;
+            border-color: #a855f7;
+            opacity: 1;
+        }
+
+        body.light .theme-btn {
+            background: #f1f5f9;
+            border-color: #dce3f0;
+            color: #718096;
+        }
+
+        body.light .theme-btn:hover {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        body.light .theme-menu {
+            background: #ffffff;
+            border-color: #dce3f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body.light .theme-item {
+            color: #4a5568;
+        }
+
+        body.light .theme-item:hover {
+            background: #f7fafc;
+            color: #2d3748;
+        }
+
+        body.light .theme-item.active {
+            background: #3182ce;
+            color: #fff;
+        }
+
+        body.light .status-loading {
+            color: #4338ca;
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+
+        body.light .status-saving {
+            color: #c2410c;
+            background: #fff7ed;
+            border-color: #fed7aa;
+        }
+
+        body.light .status-saved {
+            color: #166534;
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+
+        body.light .status-error {
+            color: #991b1b;
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        body.light #calendar {
+            background: #dce3f0;
+            border-color: #dce3f0;
+        }
+
+        body.light .day-header {
+            background: #f8faff;
+            color: #94a3b8;
+        }
+
+        body.light .day-header.sun {
+            color: #e53e3e;
+        }
+
+        body.light .day-header.sat {
+            color: #3182ce;
+        }
+
+        body.light .date-num {
+            color: #64748b;
+        }
+
+        body.light .cell.sun .date-num {
+            color: #dc2626;
+        }
+
+        body.light .cell.sat .date-num {
+            color: #2563eb;
+        }
+
+        body.light .cell.today .date-num {
+            background: #3b5bdb;
+            color: #fff;
+        }
+
+        body.light .cell.today::after {
+            border-color: #3b5bdb;
+        }
+
+        body.light .cell.empty {
+            background: #e2e8f5;
+        }
+
+        body.light #lock-screen {
+            background: #eef0f8;
+        }
+
+        body.light .lock-title {
+            color: #94a3b8;
+        }
+
+        body.light .pin-dot {
+            border-color: #cbd5e0;
+        }
+
+        body.light .pin-dot.filled {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        body.light .pin-key {
+            background: #ffffff;
+            border-color: #dce3f0;
+            color: #2d3748;
+        }
+
+        body.light .pin-key:hover {
+            background: #f7fafc;
+        }
+
+        body.light .pin-key.del {
+            color: #94a3b8;
+        }
+
+        /* ── 러블리 핑크 ── */
+        body.pink {
+            --bg-main: #1a0e15;
+            --bg-header: #220f1a;
+            --bg-cell: #1e1018;
+            --bg-cell-weekend: #241220;
+            --bg-cell-today: #2e1525;
+            --border: #4a1e35;
+            --text-main: #f5c6d8;
+            --text-muted: #9f5070;
+            --text-day-sun: #ff6b9d;
+            --text-day-sat: #c890e8;
+            --row1-on: #e5205a;
+            --row1-on-text: #fff;
+            --row1-off: #3d0c1e;
+            --row1-off-text: #a05070;
+            --row2-on: #9b3bbf;
+            --row2-on-text: #fff;
+            --row2-off: #280c38;
+            --row2-off-text: #8050a0;
+            --row3-on: #c23d6a;
+            --row3-on-text: #fff;
+            --row3-off: #350c28;
+            --row3-off-text: #903058;
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        body.pink #cal-title {
+            color: #ffd0e8;
+        }
+
+        body.pink #cal-title .nepe-count {
+            background: #350c28;
+            border-color: #7a2050;
+            color: #ff80b0;
+        }
+
+        body.pink #cal-title .nepe-count .count-num {
+            color: #ffc0d8;
+        }
+
+        body.pink #cal-title .nepe-count.goal-done {
+            background: #3d0c30;
+            border-color: #c03070;
+            color: #ff60a0;
+        }
+
+        body.pink .nav-btn {
+            border-color: #4a1e35;
+            color: #9f5070;
+        }
+
+        body.pink .nav-btn:hover {
+            background: #2e1525;
+            color: #f5c6d8;
+            border-color: #7a2050;
+        }
+
+        body.pink .lock-btn {
+            border-color: #5a1e45;
+            opacity: 0.6;
+        }
+
+        body.pink .lock-btn:hover {
+            background: #3d0c30;
+            border-color: #c03070;
+            opacity: 1;
+        }
+
+        body.pink .theme-btn {
+            background: #220f1a;
+            border-color: #4a1e35;
+            color: #9f5070;
+        }
+
+        body.pink .theme-btn:hover {
+            background: #2e1525;
+            color: #f5c6d8;
+        }
+
+        body.pink .theme-menu {
+            background: #220f1a;
+            border-color: #4a1e35;
+        }
+
+        body.pink .theme-item {
+            color: #9f5070;
+        }
+
+        body.pink .theme-item:hover {
+            background: #2e1525;
+            color: #f5c6d8;
+        }
+
+        body.pink .theme-item.active {
+            background: #c23d6a;
+            color: #fff;
+        }
+
+        body.pink .status-loading {
+            color: #c890e8;
+            background: #280c38;
+            border-color: #5a1e65;
+        }
+
+        body.pink .status-saving {
+            color: #ffb0c0;
+            background: #350c18;
+            border-color: #7a1535;
+        }
+
+        body.pink .status-saved {
+            color: #ff80b0;
+            background: #350c28;
+            border-color: #7a2050;
+        }
+
+        body.pink .status-error {
+            color: #ff6080;
+            background: #3d0c10;
+            border-color: #8a1525;
+        }
+
+        body.pink #calendar {
+            background: #4a1e35;
+            border-color: #4a1e35;
+        }
+
+        body.pink .day-header {
+            background: #220f1a;
+            color: #80304a;
+        }
+
+        body.pink .day-header.sun {
+            color: #ff6b9d;
+        }
+
+        body.pink .day-header.sat {
+            color: #c890e8;
+        }
+
+        body.pink .date-num {
+            color: #a07090;
+        }
+
+        body.pink .cell.sun .date-num {
+            color: #ff6b9d;
+        }
+
+        body.pink .cell.sat .date-num {
+            color: #c890e8;
+        }
+
+        body.pink .cell.today .date-num {
+            background: #c23d6a;
+            color: #fff;
+        }
+
+        body.pink .cell.today::after {
+            border-color: #c23d6a;
+        }
+
+        body.pink .cell.empty {
+            background: #150a12;
+        }
+
+        body.pink #lock-screen {
+            background: #120a10;
+        }
+
+        body.pink .lock-title {
+            color: #9f5070;
+        }
+
+        body.pink .pin-dot {
+            border-color: #4a1e35;
+        }
+
+        body.pink .pin-dot.filled {
+            background: #c23d6a;
+            border-color: #c23d6a;
+        }
+
+        body.pink .pin-key {
+            background: #220f1a;
+            border-color: #4a1e35;
+            color: #f5c6d8;
+        }
+
+        body.pink .pin-key:hover {
+            background: #2e1525;
+        }
+
+        body.pink .pin-key.del {
+            color: #9f5070;
+        }
+
+        /* ── 네이버 그린 ── */
+        body.green {
+            --bg-main: #0c1c14;
+            --bg-header: #0f2318;
+            --bg-cell: #111f16;
+            --bg-cell-weekend: #13201a;
+            --bg-cell-today: #122a1c;
+            --border: #1e4030;
+            --text-main: #b8e0c8;
+            --text-muted: #4a7860;
+            --text-day-sun: #ff7070;
+            --text-day-sat: #60c060;
+            --row1-on: #c0392b;
+            --row1-on-text: #fff;
+            --row1-off: #1c2c18;
+            --row1-off-text: #608050;
+            --row2-on: #27ae60;
+            --row2-on-text: #fff;
+            --row2-off: #0f2c18;
+            --row2-off-text: #3a8050;
+            --row3-on: #1e8449;
+            --row3-on-text: #fff;
+            --row3-off: #0c2818;
+            --row3-off-text: #307040;
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        body.green #cal-title {
+            color: #c8f0d8;
+        }
+
+        body.green #cal-title .nepe-count {
+            background: #0f2318;
+            border-color: #2a5038;
+            color: #60c080;
+        }
+
+        body.green #cal-title .nepe-count .count-num {
+            color: #90e0a8;
+        }
+
+        body.green #cal-title .nepe-count.goal-done {
+            background: #0c2c18;
+            border-color: #1e8449;
+            color: #4ade80;
+        }
+
+        body.green .nav-btn {
+            border-color: #1e4030;
+            color: #4a7860;
+        }
+
+        body.green .nav-btn:hover {
+            background: #172e20;
+            color: #b8e0c8;
+            border-color: #2e6048;
+        }
+
+        body.green .lock-btn {
+            border-color: #1a4030;
+            opacity: 0.6;
+        }
+
+        body.green .lock-btn:hover {
+            background: #0c2818;
+            border-color: #27ae60;
+            opacity: 1;
+        }
+
+        body.green .theme-btn {
+            background: #0f2318;
+            border-color: #1e4030;
+            color: #4a7860;
+        }
+
+        body.green .theme-btn:hover {
+            background: #172e20;
+            color: #b8e0c8;
+        }
+
+        body.green .theme-menu {
+            background: #0f2318;
+            border-color: #1e4030;
+        }
+
+        body.green .theme-item {
+            color: #4a7860;
+        }
+
+        body.green .theme-item:hover {
+            background: #172e20;
+            color: #b8e0c8;
+        }
+
+        body.green .theme-item.active {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        body.green .status-loading {
+            color: #60c080;
+            background: #0f2318;
+            border-color: #1e5030;
+        }
+
+        body.green .status-saving {
+            color: #f6ad55;
+            background: #1c1a08;
+            border-color: #5a4010;
+        }
+
+        body.green .status-saved {
+            color: #4ade80;
+            background: #0c2818;
+            border-color: #1e6040;
+        }
+
+        body.green .status-error {
+            color: #fc8181;
+            background: #200c0c;
+            border-color: #501818;
+        }
+
+        body.green #calendar {
+            background: #1e4030;
+            border-color: #1e4030;
+        }
+
+        body.green .day-header {
+            background: #0f2318;
+            color: #386050;
+        }
+
+        body.green .day-header.sun {
+            color: #ff7070;
+        }
+
+        body.green .day-header.sat {
+            color: #60c060;
+        }
+
+        body.green .date-num {
+            color: #4a7860;
+        }
+
+        body.green .cell.sun .date-num {
+            color: #ff7070;
+        }
+
+        body.green .cell.sat .date-num {
+            color: #60c060;
+        }
+
+        body.green .cell.today .date-num {
+            background: #1e8449;
+            color: #fff;
+        }
+
+        body.green .cell.today::after {
+            border-color: #27ae60;
+        }
+
+        body.green .cell.empty {
+            background: #0a1510;
+        }
+
+        body.green #lock-screen {
+            background: #080f0b;
+        }
+
+        body.green .lock-title {
+            color: #4a7860;
+        }
+
+        body.green .pin-dot {
+            border-color: #1e4030;
+        }
+
+        body.green .pin-dot.filled {
+            background: #27ae60;
+            border-color: #27ae60;
+        }
+
+        body.green .pin-key {
+            background: #0f2318;
+            border-color: #1e4030;
+            color: #b8e0c8;
+        }
+
+        body.green .pin-key:hover {
+            background: #172e20;
+        }
+
+        body.green .pin-key.del {
+            color: #4a7860;
+        }
     </style>
 </head>
 
@@ -506,6 +1174,18 @@
             <div id="cal-title">로딩 중…</div>
             <button class="nav-btn" id="btn-next">&#8250;</button>
             <span id="save-status"></span>
+            <div class="theme-dropdown" id="theme-dropdown">
+                <button class="theme-btn" id="theme-btn">
+                    <span id="theme-label">다크 모드</span>
+                    <span class="chev">▾</span>
+                </button>
+                <div class="theme-menu">
+                    <div class="theme-item active" data-theme="dark">다크 모드</div>
+                    <div class="theme-item" data-theme="light">라이트 모드</div>
+                    <div class="theme-item" data-theme="pink">러블리 핑크</div>
+                    <div class="theme-item" data-theme="green">네이버 그린</div>
+                </div>
+            </div>
         </div>
         <div id="calendar"></div>
     </div>
@@ -587,6 +1267,30 @@
             lockScreen.classList.remove('hidden');
         }
         document.getElementById('btn-lock').addEventListener('click', lock);
+
+        // ── 테마 전환 ────────────────────────────────────────────────────────────
+        const THEME_NAMES = { dark: '다크 모드', light: '라이트 모드', pink: '러블리 핑크', green: '네이버 그린' };
+        const themeDropEl = document.getElementById('theme-dropdown');
+        const themeLabelEl = document.getElementById('theme-label');
+
+        function applyTheme(t) {
+            document.body.className = document.body.className.replace(/\b(light|pink|green)\b/g, '').trim();
+            if (t !== 'dark') document.body.classList.add(t);
+            themeLabelEl.textContent = THEME_NAMES[t];
+            document.querySelectorAll('.theme-item').forEach(el =>
+                el.classList.toggle('active', el.dataset.theme === t));
+            localStorage.setItem('theme', t);
+            themeDropEl.classList.remove('open');
+        }
+        applyTheme(localStorage.getItem('theme') || 'dark');
+
+        document.getElementById('theme-btn').addEventListener('click', e => {
+            e.stopPropagation();
+            themeDropEl.classList.toggle('open');
+        });
+        document.querySelectorAll('.theme-item').forEach(el =>
+            el.addEventListener('click', () => applyTheme(el.dataset.theme)));
+        document.addEventListener('click', () => themeDropEl.classList.remove('open'));
 
         // ── 설정 ─────────────────────────────────────────────────────────────────
         const ROWS = [
@@ -771,6 +1475,6 @@
 </body>
 
 </html>
-Pressing key...Clicking...Stopping...
+Getting DOM...Pressing key...Stopping...
 
 Stop Agent
