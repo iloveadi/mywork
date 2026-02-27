@@ -164,6 +164,19 @@
             border-color: #4a5270;
         }
 
+        .lock-btn {
+            font-size: 0.95rem;
+            border-color: #3a3050;
+            opacity: 0.55;
+            transition: opacity 0.2s, background 0.18s, border-color 0.18s;
+        }
+
+        .lock-btn:hover {
+            opacity: 1;
+            background: #2a1e35;
+            border-color: #7c5cbf;
+        }
+
         /* ── 달력 그리드 ── */
         #calendar {
             flex: 1;
@@ -489,6 +502,7 @@
     <!-- 달력 본체 -->
     <div id="app">
         <div id="cal-header">
+            <button class="nav-btn lock-btn" id="btn-lock" title="잠금">🔒</button>
             <button class="nav-btn" id="btn-prev">&#8249;</button>
             <div id="cal-title">로딩 중…</div>
             <button class="nav-btn" id="btn-next">&#8250;</button>
@@ -557,6 +571,15 @@
                 updateDots(false);
             }
         });
+
+        // 헤더 클릭 시 잠금
+        function lock() {
+            sessionStorage.removeItem('unlocked');
+            pinInput = '';
+            updateDots(false);
+            lockScreen.classList.remove('hidden');
+        }
+        document.getElementById('btn-lock').addEventListener('click', lock);
 
         // ── Firebase SDK ────────────────────────────────────────────────────────
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
