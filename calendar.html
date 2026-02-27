@@ -196,7 +196,7 @@
         .day-header {
             background: var(--bg-header);
             text-align: center;
-            font-size: 0.82rem;
+            font-size: 0.9rem;
             font-weight: 600;
             padding: 7px 0;
             letter-spacing: 0.5px;
@@ -247,7 +247,7 @@
 
         /* 날짜 숫자 */
         .date-num {
-            font-size: 0.8rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: #8b9dc0;
             line-height: 1;
@@ -282,7 +282,7 @@
 
         /* 배지 */
         .badge {
-            font-size: 0.68rem;
+            font-size: 0.76rem;
             font-weight: 600;
             padding: 2px 6px;
             border-radius: 4px;
@@ -647,8 +647,8 @@
             try {
                 const snap = await getDoc(ref);
                 if (snap.exists()) {
-                    const saved = snap.data().states;
-                    // 저장된 값으로 덮어쓰기
+                    // JSON 문자열로 저장된 값을 파싱
+                    const saved = JSON.parse(snap.data().states);
                     Object.keys(saved).forEach(d => {
                         if (states[key][d]) states[key][d] = saved[d];
                     });
@@ -671,7 +671,8 @@
             const key = stateKey(year, month);
             const ref = doc(db, 'calendar', key);
             try {
-                await setDoc(ref, { states: states[key] });
+                // 중첩 배열 문제 해결: JSON 문자열로 저장
+                await setDoc(ref, { states: JSON.stringify(states[key]) });
                 setSaveStatus('✓ 저장됨', 'status-saved');
                 setTimeout(() => setSaveStatus('', ''), 2000);
             } catch (e) {
