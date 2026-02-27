@@ -182,7 +182,6 @@
             flex: 1;
             display: grid;
             grid-template-rows: auto 1fr 1fr 1fr 1fr 1fr 1fr;
-            /* 헤더 + 최대 6주 */
             grid-template-columns: repeat(7, 1fr);
             gap: 1px;
             background: var(--border);
@@ -333,7 +332,7 @@
             color: var(--row3-on-text);
         }
 
-        /* 5주 vs 6주 그리드 행 설정 */
+        /* 주 수별 그리드 행 설정 */
         #calendar.weeks-4 {
             grid-template-rows: auto 1fr 1fr 1fr 1fr;
         }
@@ -472,7 +471,6 @@
     </style>
 </head>
 
-
 <body>
     <!-- 잠금 화면 -->
     <div id="lock-screen">
@@ -512,7 +510,23 @@
     </div>
 
     <script type="module">
-        // ── PIN 잠금 화면 ──────────────────────────────────────────────────
+        // ── Firebase SDK ─────────────────────────────────────────────────────────
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
+        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD2HN1O7m0wxD3foaL-fY0HU9uG435sIdc",
+            authDomain: "mywork-73765.firebaseapp.com",
+            projectId: "mywork-73765",
+            storageBucket: "mywork-73765.firebasestorage.app",
+            messagingSenderId: "1098551880523",
+            appId: "1:1098551880523:web:b37520653cb207178996ce"
+        };
+
+        const fbApp = initializeApp(firebaseConfig);
+        const db = getFirestore(fbApp);
+
+        // ── PIN 잠금 화면 ─────────────────────────────────────────────────────────
         const CORRECT_PIN = '1212';
         const lockScreen = document.getElementById('lock-screen');
         const pinDotsEl = document.getElementById('pin-dots');
@@ -541,12 +555,8 @@
             }
         }
 
-        // 세션 중 이미 인증된 경우 바로 통과
-        if (sessionStorage.getItem('unlocked') === '1') {
-            lockScreen.classList.add('hidden');
-        }
+        if (sessionStorage.getItem('unlocked') === '1') lockScreen.classList.add('hidden');
 
-        // 키패드 클릭
         document.querySelectorAll('.pin-key[data-v]').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (pinInput.length >= 4) return;
@@ -559,20 +569,16 @@
             pinInput = pinInput.slice(0, -1);
             updateDots(false);
         });
-        // 키보드 지원
         document.addEventListener('keydown', e => {
             if (lockScreen.classList.contains('hidden')) return;
             if (e.key >= '0' && e.key <= '9' && pinInput.length < 4) {
-                pinInput += e.key;
-                updateDots(false);
+                pinInput += e.key; updateDots(false);
                 if (pinInput.length === 4) tryUnlock();
             } else if (e.key === 'Backspace') {
-                pinInput = pinInput.slice(0, -1);
-                updateDots(false);
+                pinInput = pinInput.slice(0, -1); updateDots(false);
             }
         });
 
-        // 헤더 클릭 시 잠금
         function lock() {
             sessionStorage.removeItem('unlocked');
             pinInput = '';
@@ -581,23 +587,7 @@
         }
         document.getElementById('btn-lock').addEventListener('click', lock);
 
-        // ── Firebase SDK ────────────────────────────────────────────────────────
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
-        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD2HN1O7m0wxD3foaL-fY0HU9uG435sIdc",
-            authDomain: "mywork-73765.firebaseapp.com",
-            projectId: "mywork-73765",
-            storageBucket: "mywork-73765.firebasestorage.app",
-            messagingSenderId: "1098551880523",
-            appId: "1:1098551880523:web:b37520653cb207178996ce"
-        };
-
-        const fbApp = initializeApp(firebaseConfig);
-        const db = getFirestore(fbApp);
-
-        // ── 설정: 배지 행별 이름 목록 ────────────────────────────────────────────
+        // ── 설정 ─────────────────────────────────────────────────────────────────
         const ROWS = [
             ['수면', '낮잠', '트뿜'],           // 1행 → 빨간색
             ['마음', '나허', '인북', '쉼표'],   // 2행 → 파란색
@@ -607,47 +597,35 @@
         // ── 상태 ─────────────────────────────────────────────────────────────────
         const today = new Date();
         let curYear = today.getFullYear();
-        let curMonth = today.getMonth();   // 0-based
-
-        // states[yyyy-mm][dd][rowIdx][badgeIdx] = true/false (로컬 캐시)
+        let curMonth = today.getMonth();
         const states = {};
 
         // ── 저장 상태 UI ──────────────────────────────────────────────────────────
         const saveStatusEl = document.getElementById('save-status');
         let saveTimer = null;
+        function setSaveStatus(msg, cls) { saveStatusEl.textContent = msg; saveStatusEl.className = cls; }
 
-        function setSaveStatus(msg, cls) {
-            saveStatusEl.textContent = msg;
-            saveStatusEl.className = cls;
-        }
+        // ── Firestore ─────────────────────────────────────────────────────────────
+        function stateKey(y, m) { return `${y}-${String(m + 1).padStart(2, '0')}`; }
 
-        // ── Firestore 유틸 ────────────────────────────────────────────────────────
-        function stateKey(year, month) {
-            return `${year}-${String(month + 1).padStart(2, '0')}`;
-        }
-
-        function initMonthState(year, month) {
-            const key = stateKey(year, month);
+        function initMonthState(y, m) {
+            const key = stateKey(y, m);
             if (!states[key]) {
-                const days = new Date(year, month + 1, 0).getDate();
+                const days = new Date(y, m + 1, 0).getDate();
                 states[key] = {};
-                for (let d = 1; d <= days; d++) {
+                for (let d = 1; d <= days; d++)
                     states[key][d] = ROWS.map(row => row.map(() => false));
-                }
             }
             return states[key];
         }
 
-        // Firestore에서 해당 월 데이터 로드
-        async function loadMonth(year, month) {
+        async function loadMonth(y, m) {
             setSaveStatus('불러오는 중…', 'status-loading');
-            const key = stateKey(year, month);
-            const ref = doc(db, 'calendar', key);
-            initMonthState(year, month);  // 기본값 세팅
+            const key = stateKey(y, m);
+            initMonthState(y, m);
             try {
-                const snap = await getDoc(ref);
+                const snap = await getDoc(doc(db, 'calendar', key));
                 if (snap.exists()) {
-                    // JSON 문자열로 저장된 값을 파싱
                     const saved = JSON.parse(snap.data().states);
                     Object.keys(saved).forEach(d => {
                         if (states[key][d]) states[key][d] = saved[d];
@@ -660,19 +638,16 @@
             }
         }
 
-        // Firestore에 현재 월 데이터 저장 (디바운스)
-        function scheduleSave(year, month) {
+        function scheduleSave(y, m) {
             setSaveStatus('저장 중…', 'status-saving');
             clearTimeout(saveTimer);
-            saveTimer = setTimeout(() => saveMonth(year, month), 1000);
+            saveTimer = setTimeout(() => saveMonth(y, m), 1000);
         }
 
-        async function saveMonth(year, month) {
-            const key = stateKey(year, month);
-            const ref = doc(db, 'calendar', key);
+        async function saveMonth(y, m) {
+            const key = stateKey(y, m);
             try {
-                // 중첩 배열 문제 해결: JSON 문자열로 저장
-                await setDoc(ref, { states: JSON.stringify(states[key]) });
+                await setDoc(doc(db, 'calendar', key), { states: JSON.stringify(states[key]) });
                 setSaveStatus('✓ 저장됨', 'status-saved');
                 setTimeout(() => setSaveStatus('', ''), 2000);
             } catch (e) {
@@ -681,20 +656,10 @@
             }
         }
 
-        // ── 로컬 상태 유틸 ────────────────────────────────────────────────────────
-        function getState(year, month) {
-            return states[stateKey(year, month)];
-        }
-
-        function toggleBadge(year, month, day, rowIdx, badgeIdx) {
-            const state = getState(year, month);
-            state[day][rowIdx][badgeIdx] = !state[day][rowIdx][badgeIdx];
-        }
-
-        function isOn(year, month, day, rowIdx, badgeIdx) {
-            const state = getState(year, month);
-            return state && state[day] && state[day][rowIdx] && state[day][rowIdx][badgeIdx];
-        }
+        // ── 로컬 유틸 ─────────────────────────────────────────────────────────────
+        function getState(y, m) { return states[stateKey(y, m)]; }
+        function toggleBadge(y, m, d, ri, bi) { getState(y, m)[d][ri][bi] = !getState(y, m)[d][ri][bi]; }
+        function isOn(y, m, d, ri, bi) { const s = getState(y, m); return s && s[d] && s[d][ri] && s[d][ri][bi]; }
 
         // ── 렌더링 ───────────────────────────────────────────────────────────────
         const calEl = document.getElementById('calendar');
@@ -702,41 +667,28 @@
         const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
         const NEPE_GOAL = 15;
 
-        function countNepe(year, month) {
-            const state = getState(year, month);
-            if (!state) return 0;
-            const days = new Date(year, month + 1, 0).getDate();
-            let count = 0;
-            for (let d = 1; d <= days; d++) {
-                if (state[d] && state[d][2] && state[d][2][0]) count++;
-            }
-            return count;
+        function countNepe(y, m) {
+            const s = getState(y, m); if (!s) return 0;
+            const days = new Date(y, m + 1, 0).getDate(); let n = 0;
+            for (let d = 1; d <= days; d++) if (s[d] && s[d][2] && s[d][2][0]) n++;
+            return n;
         }
 
-        function updateTitle(year, month) {
-            const cnt = countNepe(year, month);
-            const done = cnt >= NEPE_GOAL;
-            titleEl.innerHTML =
-                `${year}년 ${month + 1}월` +
-                `<span class="nepe-count${done ? ' goal-done' : ''}" title="네폐(블로그) 작성 횟수">` +
-                `네폐 <span class="count-num">${cnt}</span> / ${NEPE_GOAL}` +
-                `</span>`;
+        function updateTitle(y, m) {
+            const cnt = countNepe(y, m), done = cnt >= NEPE_GOAL;
+            titleEl.innerHTML = `${y}년 ${m + 1}월`
+                + `<span class="nepe-count${done ? ' goal-done' : ''}" title="네폐(블로그) 작성 횟수">`
+                + `네폐 <span class="count-num">${cnt}</span> / ${NEPE_GOAL}</span>`;
         }
 
         function render() {
             calEl.innerHTML = '';
+            const y = curYear, m = curMonth;
+            const fd = new Date(y, m, 1).getDay(), dim = new Date(y, m + 1, 0).getDate();
+            const nw = Math.ceil((fd + dim) / 7);
+            calEl.className = `weeks-${nw}`;
+            updateTitle(y, m);
 
-            const year = curYear;
-            const month = curMonth;
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const totalCells = firstDay + daysInMonth;
-            const numWeeks = Math.ceil(totalCells / 7);
-            calEl.className = `weeks-${numWeeks}`;
-
-            updateTitle(year, month);
-
-            // 요일 헤더
             DAY_NAMES.forEach((name, i) => {
                 const el = document.createElement('div');
                 el.className = 'day-header' + (i === 0 ? ' sun' : i === 6 ? ' sat' : '');
@@ -744,47 +696,38 @@
                 calEl.appendChild(el);
             });
 
-            // 날짜 셀
-            for (let cell = 0; cell < numWeeks * 7; cell++) {
-                const day = cell - firstDay + 1;
-                const weekday = cell % 7;
-                const isValid = day >= 1 && day <= daysInMonth;
-
+            for (let cell = 0; cell < nw * 7; cell++) {
+                const day = cell - fd + 1, wd = cell % 7;
+                const valid = day >= 1 && day <= dim;
                 const cellEl = document.createElement('div');
                 cellEl.className = 'cell';
-                if (!isValid) {
-                    cellEl.classList.add('empty');
-                } else {
-                    if (weekday === 0) cellEl.classList.add('sun', 'weekend');
-                    if (weekday === 6) cellEl.classList.add('sat', 'weekend');
-                    const isToday = (year === today.getFullYear() && month === today.getMonth() && day === today.getDate());
-                    if (isToday) cellEl.classList.add('today');
+                if (!valid) { cellEl.classList.add('empty'); }
+                else {
+                    if (wd === 0) cellEl.classList.add('sun', 'weekend');
+                    if (wd === 6) cellEl.classList.add('sat', 'weekend');
+                    if (y === today.getFullYear() && m === today.getMonth() && day === today.getDate())
+                        cellEl.classList.add('today');
 
-                    // 날짜 숫자
                     const numEl = document.createElement('div');
                     numEl.className = 'date-num';
                     numEl.textContent = day;
                     cellEl.appendChild(numEl);
 
-                    // 배지 행들
-                    ROWS.forEach((rowItems, rowIdx) => {
+                    ROWS.forEach((rowItems, ri) => {
                         const rowEl = document.createElement('div');
                         rowEl.className = 'badge-row';
-
-                        rowItems.forEach((label, badgeIdx) => {
-                            const badgeEl = document.createElement('span');
-                            const on = isOn(year, month, day, rowIdx, badgeIdx);
-                            badgeEl.className = `badge row${rowIdx + 1}${on ? ' on' : ''}`;
-                            badgeEl.textContent = label;
-                            badgeEl.addEventListener('click', () => {
-                                toggleBadge(year, month, day, rowIdx, badgeIdx);
-                                badgeEl.classList.toggle('on');
-                                if (rowIdx === 2 && badgeIdx === 0) updateTitle(year, month);
-                                scheduleSave(year, month);  // Firebase에 저장
+                        rowItems.forEach((label, bi) => {
+                            const badge = document.createElement('span');
+                            badge.className = `badge row${ri + 1}${isOn(y, m, day, ri, bi) ? ' on' : ''}`;
+                            badge.textContent = label;
+                            badge.addEventListener('click', () => {
+                                toggleBadge(y, m, day, ri, bi);
+                                badge.classList.toggle('on');
+                                if (ri === 2 && bi === 0) updateTitle(y, m);
+                                scheduleSave(y, m);
                             });
-                            rowEl.appendChild(badgeEl);
+                            rowEl.appendChild(badge);
                         });
-
                         cellEl.appendChild(rowEl);
                     });
                 }
@@ -792,41 +735,36 @@
             }
         }
 
-        // ── 월 로드 & 렌더 ───────────────────────────────────────────────────────
-        async function changeMonth(year, month) {
+        async function changeMonth(y, m) {
             calEl.innerHTML = '<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;color:#4a5270;font-size:0.9rem;">불러오는 중…</div>';
-            await loadMonth(year, month);
+            await loadMonth(y, m);
             render();
         }
 
-        // ── 이벤트 ──────────────────────────────────────────────────────────────
         document.getElementById('btn-prev').addEventListener('click', () => {
-            curMonth--;
-            if (curMonth < 0) { curMonth = 11; curYear--; }
-            changeMonth(curYear, curMonth);
+            curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; } changeMonth(curYear, curMonth);
         });
         document.getElementById('btn-next').addEventListener('click', () => {
-            curMonth++;
-            if (curMonth > 11) { curMonth = 0; curYear++; }
-            changeMonth(curYear, curMonth);
+            curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; } changeMonth(curYear, curMonth);
         });
 
-        // ── 휠 스크롤로 월 이동 ──────────────────────────────────────────────
+        // ── 휴둑 스크롤로 월 이동 ─────────────────────────────────────────
         let wheelLock = false;
         document.getElementById('app').addEventListener('wheel', e => {
             if (wheelLock) return;
             e.preventDefault();
             wheelLock = true;
-            setTimeout(() => wheelLock = false, 500);
+            setTimeout(() => wheelLock = false, 500);  // 0.5초 디바운스
             if (e.deltaY > 0) {
+                // 아래로 → 다음 달
                 curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; }
             } else {
+                // 위로 → 이전 달
                 curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; }
             }
             changeMonth(curYear, curMonth);
         }, { passive: false });
 
-        // 초기 로드
         changeMonth(curYear, curMonth);
     </script>
 </body>
