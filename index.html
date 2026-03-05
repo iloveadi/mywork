@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -1208,17 +1207,23 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
         import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD2HN1O7m0wxD3foaL-fY0HU9uG435sIdc",
-            authDomain: "mywork-73765.firebaseapp.com",
-            projectId: "mywork-73765",
-            storageBucket: "mywork-73765.firebasestorage.app",
-            messagingSenderId: "1098551880523",
-            appId: "1:1098551880523:web:b37520653cb207178996ce"
-        };
+        let fbApp;
+        let db;
 
-        const fbApp = initializeApp(firebaseConfig);
-        const db = getFirestore(fbApp);
+        try {
+            const firebaseConfig = {
+                apiKey: "AIzaSyD2HN1O7m0wxD3foaL-fY0HU9uG435sIdc",
+                authDomain: "mywork-73765.firebaseapp.com",
+                projectId: "mywork-73765",
+                storageBucket: "mywork-73765.firebasestorage.app",
+                messagingSenderId: "1098551880523",
+                appId: "1:1098551880523:web:b37520653cb207178996ce"
+            };
+            fbApp = initializeApp(firebaseConfig);
+            db = getFirestore(fbApp);
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+        }
 
         // ── PIN 잠금 화면 ─────────────────────────────────────────────────────────
         const CORRECT_PIN = '1212';
@@ -1249,28 +1254,43 @@
             }
         }
 
-        if (sessionStorage.getItem('unlocked') === '1') lockScreen.classList.add('hidden');
+        if (sessionStorage.getItem('unlocked') === '1') {
+            lockScreen.classList.add('hidden');
+        } else {
+            lockScreen.classList.remove('hidden');
+        }
 
-        document.querySelectorAll('.pin-key[data-v]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (pinInput.length >= 4) return;
-                pinInput += btn.dataset.v;
-                updateDots(false);
-                if (pinInput.length === 4) tryUnlock();
-            });
-        });
-        document.getElementById('pin-del').addEventListener('click', () => {
+        // 입력 함수 통합
+        const addPin = (v) => {
+            if (pinInput.length >= 4) return;
+            pinInput += v;
+            updateDots(false);
+            if (pinInput.length === 4) tryUnlock();
+        };
+
+        const delPin = () => {
             pinInput = pinInput.slice(0, -1);
             updateDots(false);
+        };
+
+        // 버튼 클릭 이벤트
+        document.querySelectorAll('.pin-key[data-v]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                addPin(btn.dataset.v);
+            });
         });
+
+        document.getElementById('pin-del').addEventListener('click', (e) => {
+            e.preventDefault();
+            delPin();
+        });
+
+        // 키보드 이벤트
         document.addEventListener('keydown', e => {
             if (lockScreen.classList.contains('hidden')) return;
-            if (e.key >= '0' && e.key <= '9' && pinInput.length < 4) {
-                pinInput += e.key; updateDots(false);
-                if (pinInput.length === 4) tryUnlock();
-            } else if (e.key === 'Backspace') {
-                pinInput = pinInput.slice(0, -1); updateDots(false);
-            }
+            if (e.key >= '0' && e.key <= '9') addPin(e.key);
+            else if (e.key === 'Backspace') delPin();
         });
 
         function lock() {
@@ -1305,7 +1325,12 @@
             el.addEventListener('click', () => applyTheme(el.dataset.theme)));
         document.addEventListener('click', () => themeDropEl.classList.remove('open'));
 
-        // ── 설정 ─────────────────────────────────────────────────────────────────
+        // ── 설정 (배지 순서) ──────────────────────────────────────────────────────
+        const ROWS = [
+            ['수면', '케레', '트뿜', '낮잠'],           // 1행
+            ['마음', '인북', '나허', '개발'],           // 2행
+            ['네페', '티페'],                           // 3행
+        ];
 
         // ── 상태 ─────────────────────────────────────────────────────────────────
         const today = new Date();
@@ -1336,6 +1361,7 @@
             setSaveStatus('불러오는 중…', 'status-loading');
             const key = stateKey(y, m);
             initMonthState(y, m);
+            if (!db) { setSaveStatus('⚠ DB 로드 실패', 'status-error'); return; }
             try {
                 const snap = await getDoc(doc(db, 'calendar', key));
                 if (snap.exists()) {
@@ -1358,6 +1384,7 @@
         }
 
         async function saveMonth(y, m) {
+            if (!db) return;
             const key = stateKey(y, m);
             try {
                 await setDoc(doc(db, 'calendar', key), { states: JSON.stringify(states[key]) });
@@ -1472,21 +1499,22 @@
             curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; } changeMonth(curYear, curMonth);
         });
 
-        // ── 휴둑 스크롤로 월 이동 ─────────────────────────────────────────
         let wheelLock = false;
         document.getElementById('app').addEventListener('wheel', e => {
             if (wheelLock) return;
             e.preventDefault();
             wheelLock = true;
-            setTimeout(() => wheelLock = false, 500);  // 0.5초 디바운스
+            setTimeout(() => wheelLock = false, 500);
             if (e.deltaY > 0) {
-                // 아래로 → 다음 달
                 curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; }
             } else {
-                // 위로 → 이전 달
                 curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; }
             }
             changeMonth(curYear, curMonth);
-        }, {
-            </body>
-                                                        </html>
+        }, { passive: false });
+
+        changeMonth(curYear, curMonth);
+    </script>
+</body>
+
+</html>
