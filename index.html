@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -77,7 +78,8 @@
             color: #e8ecf4;
         }
 
-        #cal-title .nepe-count {
+        #cal-title .nepe-count,
+        #cal-title .tipe-count {
             font-weight: 600;
             font-size: 1rem;
             margin-left: 10px;
@@ -90,18 +92,21 @@
             letter-spacing: 0;
         }
 
-        #cal-title .nepe-count.goal-done {
+        #cal-title .nepe-count.goal-done,
+        #cal-title .tipe-count.goal-done {
             background: #1a3528;
             border-color: #276749;
             color: #4ade80;
         }
 
-        #cal-title .nepe-count .count-num {
+        #cal-title .nepe-count .count-num,
+        #cal-title .tipe-count .count-num {
             color: #e2e8f0;
             font-size: 1.1rem;
         }
 
-        #cal-title .nepe-count.goal-done .count-num {
+        #cal-title .nepe-count.goal-done .count-num,
+        #cal-title .tipe-count.goal-done .count-num {
             color: #4ade80;
         }
 
@@ -574,17 +579,20 @@
             color: #1e293b;
         }
 
-        body.light #cal-title .nepe-count {
+        body.light #cal-title .nepe-count,
+        body.light #cal-title .tipe-count {
             background: #eef2ff;
             border-color: #c7d2fe;
             color: #4338ca;
         }
 
-        body.light #cal-title .nepe-count .count-num {
+        body.light #cal-title .nepe-count .count-num,
+        body.light #cal-title .tipe-count .count-num {
             color: #3730a3;
         }
 
-        body.light #cal-title .nepe-count.goal-done {
+        body.light #cal-title .nepe-count.goal-done,
+        body.light #cal-title .tipe-count.goal-done {
             background: #dcfce7;
             border-color: #86efac;
             color: #166534;
@@ -773,17 +781,20 @@
             color: #ffd0e8;
         }
 
-        body.pink #cal-title .nepe-count {
+        body.pink #cal-title .nepe-count,
+        body.pink #cal-title .tipe-count {
             background: #350c28;
             border-color: #7a2050;
             color: #ff80b0;
         }
 
-        body.pink #cal-title .nepe-count .count-num {
+        body.pink #cal-title .nepe-count .count-num,
+        body.pink #cal-title .tipe-count .count-num {
             color: #ffc0d8;
         }
 
-        body.pink #cal-title .nepe-count.goal-done {
+        body.pink #cal-title .nepe-count.goal-done,
+        body.pink #cal-title .tipe-count.goal-done {
             background: #3d0c30;
             border-color: #c03070;
             color: #ff60a0;
@@ -971,17 +982,20 @@
             color: #c8f0d8;
         }
 
-        body.green #cal-title .nepe-count {
+        body.green #cal-title .nepe-count,
+        body.green #cal-title .tipe-count {
             background: #0f2318;
             border-color: #2a5038;
             color: #60c080;
         }
 
-        body.green #cal-title .nepe-count .count-num {
+        body.green #cal-title .nepe-count .count-num,
+        body.green #cal-title .tipe-count .count-num {
             color: #90e0a8;
         }
 
-        body.green #cal-title .nepe-count.goal-done {
+        body.green #cal-title .nepe-count.goal-done,
+        body.green #cal-title .tipe-count.goal-done {
             background: #0c2c18;
             border-color: #1e8449;
             color: #4ade80;
@@ -1295,7 +1309,7 @@
         const ROWS = [
             ['수면', '낮잠', '트뿜', '케레'],           // 1행 → 빨간색
             ['마음', '나허', '인북', '개발'],   // 2행 → 파란색
-            ['네폐', '티폐'],                   // 3행 → 녹색
+            ['네페', '티페'],                   // 3행 → 녹색
         ];
 
         // ── 상태 ─────────────────────────────────────────────────────────────────
@@ -1370,6 +1384,7 @@
         const titleEl = document.getElementById('cal-title');
         const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
         const NEPE_GOAL = 15;
+        const TIPE_GOAL = 15;
 
         function countNepe(y, m) {
             const s = getState(y, m); if (!s) return 0;
@@ -1378,11 +1393,21 @@
             return n;
         }
 
+        function countTipe(y, m) {
+            const s = getState(y, m); if (!s) return 0;
+            const days = new Date(y, m + 1, 0).getDate(); let n = 0;
+            for (let d = 1; d <= days; d++) if (s[d] && s[d][2] && s[d][2][1]) n++;
+            return n;
+        }
+
         function updateTitle(y, m) {
-            const cnt = countNepe(y, m), done = cnt >= NEPE_GOAL;
+            const cntN = countNepe(y, m), doneN = cntN >= NEPE_GOAL;
+            const cntT = countTipe(y, m), doneT = cntT >= TIPE_GOAL;
             titleEl.innerHTML = `${y}년 ${m + 1}월`
-                + `<span class="nepe-count${done ? ' goal-done' : ''}" title="네폐(블로그) 작성 횟수">`
-                + `네폐 <span class="count-num">${cnt}</span> / ${NEPE_GOAL}</span>`;
+                + `<span class="nepe-count${doneN ? ' goal-done' : ''}" title="네페(블로그) 작성 횟수">`
+                + `네페 <span class="count-num">${cntN}</span> / ${NEPE_GOAL}</span>`
+                + `<span class="tipe-count${doneT ? ' goal-done' : ''}" title="티페(티스토리) 작성 횟수">`
+                + `티페 <span class="count-num">${cntT}</span> / ${TIPE_GOAL}</span>`;
         }
 
         function render() {
@@ -1427,7 +1452,7 @@
                             badge.addEventListener('click', () => {
                                 toggleBadge(y, m, day, ri, bi);
                                 badge.classList.toggle('on');
-                                if (ri === 2 && bi === 0) updateTitle(y, m);
+                                if (ri === 2 && (bi === 0 || bi === 1)) updateTitle(y, m);
                                 scheduleSave(y, m);
                             });
                             rowEl.appendChild(badge);
@@ -1473,11 +1498,7 @@
     </script>
 </body>
 
-<<<<<<< HEAD </html>
-    =======
-
 </html>
 Getting DOM...Pressing key...Stopping...
 
 Stop Agent
->>>>>>> 0f8554a4ea246aa3f94105f7474ca700a6fce25a
